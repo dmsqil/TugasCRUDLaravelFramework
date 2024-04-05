@@ -9,7 +9,6 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 
-
 class ProductController extends Controller
 {
     /**
@@ -17,12 +16,12 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function index()
+    {
+        $products = Product::all();
+        return view('welcome', ['products' => $products]);
+    }
 
-  public function index()
-  {
-      $products = Product::all();
-      return view('products.index', ['products' => $products]);
-  }
     /**
      * Show the form for creating a new resource.
      *
@@ -30,7 +29,7 @@ class ProductController extends Controller
      */
     public function create(): Response
     {
-        return response(view('products.create'));
+        return response(view('produk.create'));
     }
 
     /**
@@ -41,67 +40,57 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request): RedirectResponse
     {
-      if (Product::create($request->validated())) {
-          return redirect(route('index'))->with('success', 'Added!');
-      }
+        if (Product::create($request->validated())) {
+            return redirect(route('index'))->with('success', 'Added!');
+        }
 
+        return redirect(route('index'))->with('error', 'Failed to add product!');
     }
 
     /**
-     * Display the specified resource.
+     * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  string  $id
      * @return \Illuminate\Http\Response
      */
     public function edit(string $id): Response
     {
         $product = Product::findOrFail($id);
-        return response(view('products.edit', ['product' => $product]));
-    }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
+        return response(view('produk.edit', ['product' => $product]));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  string  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateProductRequest $request, string $id):       RedirectResponse
+    public function update(UpdateProductRequest $request, string $id): RedirectResponse
     {
-      $product = Product::findOrFail($id);
+        $product = Product::findOrFail($id);
 
-      if ($product->update($request->validated())) {
-          return redirect(route('index'))->with('success', 'Updated!'); 
-      }
+        if ($product->update($request->validated())) {
+            return redirect(route('index'))->with('success', 'Updated!'); 
+        }
+
+        return redirect(route('index'))->with('error', 'Failed to update product!');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  string  $id
      * @return \Illuminate\Http\Response
      */
-  public function destroy(string $id): RedirectResponse
-  {
-      $product = Product::findOrFail($id);
+    public function destroy(string $id): RedirectResponse
+    {
+        $product = Product::findOrFail($id);
 
-      if ($product->delete()) {
-          return redirect(route('products.index'))->with('success', 'Deleted!');
-      }
+        if ($product->delete()) {
+            return redirect(route('index'))->with('success', 'Deleted!');
+        }
 
-      return redirect(route('products.index'))->with('error', 'Sorry, unable to delete this!');
-  }
-
+        return redirect(route('index'))->with('error', 'Sorry, unable to delete this product!');
+    }
 }
